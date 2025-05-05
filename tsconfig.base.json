@@ -14,7 +14,9 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@/hooks": ["libs/shared/hooks/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
