@@ -28,17 +28,34 @@ export function useSubscription<T>(
 ): React.RefObject<Subscription | undefined> {
   // Implementation return type matches overloads
   const subscriptionRef = useRef<Subscription | undefined>(undefined);
+  // Refs to store the latest callbacks/observer
+  const latestObserverOrNextRef = useRef(observerOrNext);
+  const latestErrorRef = useRef(error);
+  const latestCompleteRef = useRef(complete);
+
+  // Update refs on every render
+  useEffect(() => {
+    latestObserverOrNextRef.current = observerOrNext;
+    latestErrorRef.current = error;
+    latestCompleteRef.current = complete;
+  });
 
   useEffect(() => {
     let actualObserver: Observer<T>;
 
-    // Check which overload was used based on the type of the second argument
-    if (typeof observerOrNext === 'function') {
+    // Check which overload was used based on the type of the *latest* second argument from the ref
+    if (typeof latestObserverOrNextRef.current === 'function') {
       // First overload was used: (observable, next, error?, complete?)
-      actualObserver = { next: observerOrNext, error, complete };
+      // Construct the observer using functions from refs
+      actualObserver = {
+        next: latestObserverOrNextRef.current,
+        error: latestErrorRef.current,
+        complete: latestCompleteRef.current,
+      };
     } else {
       // Second overload was used: (observable, observer)
-      actualObserver = observerOrNext;
+      // Use the observer object directly from the ref
+      actualObserver = latestObserverOrNextRef.current;
     }
 
     subscriptionRef.current = observable.subscribe(actualObserver);
@@ -46,8 +63,8 @@ export function useSubscription<T>(
     return () => {
       subscriptionRef.current?.unsubscribe();
     };
-    // Dependency array needs to include all potential inputs that affect the subscription
-  }, [observable, observerOrNext, error, complete]);
+    // Only depend on the observable; callbacks are accessed via refs
+  }, [observable]);
 
   return subscriptionRef;
 }
