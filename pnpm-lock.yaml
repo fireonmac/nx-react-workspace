@@ -39,6 +39,12 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4(@types/react@19.0.0)(react@19.1.0)(use-sync-external-store@1.5.0(react@19.1.0))
     devDependencies:
+      '@babel/core':
+        specifier: ^7.14.5
+        version: 7.27.1
+      '@babel/preset-react':
+        specifier: ^7.14.5
+        version: 7.27.1(@babel/core@7.27.1)
       '@eslint/js':
         specifier: ^9.8.0
         version: 9.26.0
