@@ -28,27 +28,27 @@ export function useSubscription<T>(
 ): React.RefObject<Subscription | undefined> {
   // Implementation return type matches overloads
   const subscriptionRef = useRef<Subscription | undefined>(undefined);
-  // Refs to store the latest callbacks/observer
-  const latestObserverOrNextRef = useRef(observerOrNext);
-  const latestErrorRef = useRef(error);
-  const latestCompleteRef = useRef(complete);
+  // Refs to store the callbacks/observer to avoid re-creating them on every render
+  const observerOrNextRef = useRef(observerOrNext);
+  const errorRef = useRef(error);
+  const completeRef = useRef(complete);
 
   useEffect(() => {
     let actualObserver: Observer<T>;
 
     // Check which overload was used based on the type of the *latest* second argument from the ref
-    if (typeof latestObserverOrNextRef.current === 'function') {
+    if (typeof observerOrNextRef.current === 'function') {
       // First overload was used: (observable, next, error?, complete?)
       // Construct the observer using functions from refs
       actualObserver = {
-        next: latestObserverOrNextRef.current,
-        error: latestErrorRef.current,
-        complete: latestCompleteRef.current,
+        next: observerOrNextRef.current,
+        error: errorRef.current,
+        complete: completeRef.current,
       };
     } else {
       // Second overload was used: (observable, observer)
       // Use the observer object directly from the ref
-      actualObserver = latestObserverOrNextRef.current;
+      actualObserver = observerOrNextRef.current;
     }
 
     subscriptionRef.current = observable.subscribe(actualObserver);
