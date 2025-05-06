@@ -33,13 +33,6 @@ export function useSubscription<T>(
   const latestErrorRef = useRef(error);
   const latestCompleteRef = useRef(complete);
 
-  // Update refs on every render
-  useEffect(() => {
-    latestObserverOrNextRef.current = observerOrNext;
-    latestErrorRef.current = error;
-    latestCompleteRef.current = complete;
-  });
-
   useEffect(() => {
     let actualObserver: Observer<T>;
 
